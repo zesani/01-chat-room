@@ -4,6 +4,8 @@ var http = require('http').Server(app)
 var io = require('socket.io')(http)
 app.use('/', express.static('dist'))
 var numberUser = 0
+var port = process.env.PORT || 3000
+
 io.on('connection', function (socket) {
   console.log('new connect')
   var addedUser = false
@@ -53,6 +55,6 @@ io.on('connection', function (socket) {
   })
 })
 
-http.listen(process.env.PORT, function () {
-  console.log('listening on *:', process.env.PORT)
+http.listen(port, function () {
+  console.log('listening on *:', port)
 })
