@@ -2,10 +2,15 @@ var express = require('express')
 var app = express()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
-app.use('/', express.static('dist'))
+var path = require("path");
+app.use('/', express.static(path.join(__dirname, 'dist')))
 var numberUser = 0
 var port = process.env.PORT || 3000
 
+// console.log(". = %s", path.resolve("."));
+// console.log("__dirname = %s", path.resolve(__dirname));
+// console.log(express.static('dist'))
+// .use((req, res) => res.sendFile(INDEX) )
 io.on('connection', function (socket) {
   console.log('new connect')
   var addedUser = false
