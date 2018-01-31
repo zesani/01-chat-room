@@ -11,7 +11,6 @@ var port = process.env.PORT || 3000
 // console.log("__dirname = %s", path.resolve(__dirname));
 // console.log(express.static('dist'))
 // .use((req, res) => res.sendFile(INDEX) )
-app.get('/hello', (req, res) => res.sendFile(path.join(__dirname, 'dist/index.html')) )
 io.on('connection', function (socket) {
   console.log('new connect')
   var addedUser = false
