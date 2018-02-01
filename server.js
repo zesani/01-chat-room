@@ -2,60 +2,89 @@ var express = require('express')
 var app = express()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
-var path = require("path");
-app.use('/', express.static(path.join(__dirname, 'dist')))
-var numberUser = 0
+var path = require('path')
+app.use(express.static(path.join(__dirname, 'dist')))
 var port = process.env.PORT || 3000
 
-// console.log(". = %s", path.resolve("."));
-// console.log("__dirname = %s", path.resolve(__dirname));
-// console.log(express.static('dist'))
-// .use((req, res) => res.sendFile(INDEX) )
+var numberUser = {
+  all: 0,
+  general: 0,
+  learning: 0,
+  game: 0
+}
+var storeMessages = []
 io.on('connection', function (socket) {
-  console.log('new connect')
   var addedUser = false
-  numberUser++
-  socket.on('add new user', function (username, room) {
+  socket.emit('update room', numberUser)
+  // socket.emit('get all messages', storeMessages)
+  socket.on('add new user', function (username, room, avatar) {
     if (addedUser) return
+    numberUser['all']++
     socket.username = username
+    socket.avatar = avatar
     addedUser = true
-    console.log(username, room)
     socket.join(room, function () {
-      console.log(socket.username)
+      numberUser[room]++
       socket.room = room
       socket.emit('login', {
         username: socket.username,
         id: socket.id,
-        room: socket.room
+        room: socket.room,
+        avatar: socket.avatar,
+        time: Date.now()
       })
-      socket.broadcast.emit('user joined', {
-        username: socket.username,
-        id: socket.id
-      })
-    })
-    socket.on('new message', function (data) {
-      console.log(socket.room)
-      socket.to(socket.room).emit('new message', {
+      socket.to(socket.room).emit('user joined', {
         username: socket.username,
         id: socket.id,
+        room: socket.room,
+        avatar: socket.avatar,
+        time: Date.now(),
+        numberUser: numberUser
+      })
+      io.sockets.emit('update room', numberUser)
+    })
+    socket.on('new message', function (data) {
+      console.log(socket.avatar)
+      let message = {
+        username: socket.username,
+        id: socket.id,
+        avatar: socket.avatar,
         message: data,
-        server: true
+        source: 'client',
+        room: socket.room,
+        time: Date.now()
+      }
+      socket.to(socket.room).emit('new message', message)
+      storeMessages.push(message)
+    })
+    socket.on('join room', function (room) {
+      socket.leave(socket.room, function () {
+        numberUser[socket.room]--
+        socket.to(socket.room).emit('user leaved', {
+          username: socket.username,
+          id: socket.id,
+          room: socket.room,
+          avatar: socket.avatar
+        })
+        socket.join(room, function () {
+          socket.room = room
+          numberUser[socket.room]++
+          socket.to(socket.room).emit('user joined', {
+            username: socket.username,
+            id: socket.id,
+            room: socket.room,
+            avatar: socket.avatar
+          })
+          socket.emit('change room', socket.room)
+          io.sockets.emit('update room', numberUser)
+        })
       })
     })
-    socket.on('disconnect', function (a) {
-      console.log('1')
-      socket.disconnect(true, function () {
-        console.log('2')
-        socket.emit('logout')
-      })
-    })
-    socket.on('new message', function (data) {
-      console.log(socket.room)
-      socket.to(socket.room).emit('new message', {
-        username: socket.username,
-        id: socket.id,
-        message: data
-      })
+    socket.on('disconnect', function (reason) {
+      numberUser[socket.room]--
+      console.log('disconnect', socket.room, reason)
+      console.log(io.sockets.adapter.sids[socket.id])
+      io.sockets.emit('update room', numberUser)
     })
   })
 })

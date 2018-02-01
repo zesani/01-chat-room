@@ -1,6 +1,6 @@
 <template>
-    <div id="register" class="columns is-multiline">
-        <div class="column is-12 input-username">
+    <div id="register" class="columns is-multiline is-mobile">
+        <div class="column is-12-mobile input-username">
           Select your Room:
           <b-field>
             <b-radio-button v-model="room"
