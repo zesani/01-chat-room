@@ -2,6 +2,7 @@
     <div  id="chat-room" class="columns is-multiline is-mobile">
        <div class="column is-10-mobile is-offset-1-mobile is-gapless is-10-tablet is-offset-1-tablet">
             <div class="header-chat">
+              <br>
               <strong>Name : </strong>{{user.username}} <br>
               <strong>Select your Room :</strong>
               <b-field>

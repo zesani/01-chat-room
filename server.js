@@ -44,7 +44,6 @@ io.on('connection', function (socket) {
       io.sockets.emit('update room', numberUser)
     })
     socket.on('new message', function (data) {
-      console.log(socket.avatar)
       let message = {
         username: socket.username,
         id: socket.id,
@@ -82,7 +81,6 @@ io.on('connection', function (socket) {
     })
     socket.on('disconnect', function (reason) {
       numberUser[socket.room]--
-      console.log('disconnect', socket.room, reason)
       socket.to(socket.room).emit('user leaved', {
         username: socket.username,
         id: socket.id,

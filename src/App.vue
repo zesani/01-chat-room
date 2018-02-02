@@ -129,7 +129,11 @@ html, body {
 .bg {
   min-height: 100vh;
   margin-top: 0;
-  background-color: #F7C444;
+  background-color: #FFEEB8;
   color: black;
 }
+</style>
+<style lang="scss">
+$primary: #254552;
+@import "~bulma";
 </style>
