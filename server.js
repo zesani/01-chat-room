@@ -83,7 +83,12 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function (reason) {
       numberUser[socket.room]--
       console.log('disconnect', socket.room, reason)
-      console.log(io.sockets.adapter.sids[socket.id])
+      socket.to(socket.room).emit('user leaved', {
+        username: socket.username,
+        id: socket.id,
+        room: socket.room,
+        avatar: socket.avatar
+      })
       io.sockets.emit('update room', numberUser)
     })
   })
